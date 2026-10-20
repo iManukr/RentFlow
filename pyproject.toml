@@ -1,0 +1,13 @@
+[project]
+name = "rentflow"
+version = "1.0.0"
+description = "RentFlow - car rental management system for SafariDrive Rentals (Python OOP capstone)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []          # standard library only
+
+[dependency-groups]
+dev = []
+
+[tool.uv]
+package = false            # a script/app, not an installable library

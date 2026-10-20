@@ -1,0 +1,263 @@
+
+############################################################
+# 1. THE FLEET (abstraction and inheritance)
+############################################################
+KDK 123A  Toyota Axio (2022)
+  Category: Economy  Rate: KSh 4,000/day    Status: AVAILABLE
+KCZ 908A  Mazda Demio (2020)
+  Category: Economy  Rate: KSh 3,500/day    Status: AVAILABLE
+KDJ 456B  Toyota Prado (2023)
+  Category: SUV      Rate: KSh 8,000/day    Status: AVAILABLE
+KDJ 672B  Nissan X-Trail (2021)
+  Category: SUV      Rate: KSh 6,500/day    Status: AVAILABLE
+KDL 789C  Mercedes-Benz E-Class (2024)
+  Category: Luxury   Rate: KSh 15,000/day    Status: AVAILABLE
+KDM 112D  BMW 5 Series (2023)
+  Category: Luxury   Rate: KSh 13,000/day    Status: AVAILABLE
+
+A plain Vehicle cannot be created - it is abstract:
+  TypeError: Can't instantiate abstract class Vehicle without an implementation for abstract method 'calculate_rental_cost'
+
+############################################################
+# 2. POLYMORPHISM - the same call, three different prices
+############################################################
+  Economy  Toyota Axio            3 days = KSh  12,000
+  SUV      Toyota Prado           3 days = KSh  26,000
+  Luxury   Mercedes-Benz E-Class  3 days = KSh  49,500
+
+############################################################
+# 3. THE DRIVING-LICENCE RULE
+############################################################
+  Error: Grace Njeri cannot rent without a driving licence.
+
+############################################################
+# 4. SEARCHING THE FLEET
+############################################################
+
+AVAILABLE VEHICLES
+
+1. Toyota Axio
+   Registration: KDK 123A
+   Rate: KSh 4,000/day
+
+2. Mazda Demio
+   Registration: KCZ 908A
+   Rate: KSh 3,500/day
+
+3. Toyota Prado
+   Registration: KDJ 456B
+   Rate: KSh 8,000/day
+
+4. Nissan X-Trail
+   Registration: KDJ 672B
+   Rate: KSh 6,500/day
+
+5. Mercedes-Benz E-Class
+   Registration: KDL 789C
+   Rate: KSh 15,000/day
+
+6. BMW 5 Series
+   Registration: KDM 112D
+   Rate: KSh 13,000/day
+
+
+AVAILABLE SUVs
+
+1. Toyota Prado
+   Registration: KDJ 456B
+   Rate: KSh 8,000/day
+
+2. Nissan X-Trail
+   Registration: KDJ 672B
+   Rate: KSh 6,500/day
+
+
+AVAILABLE SUVs
+(up to KSh 7,000/day)
+
+1. Nissan X-Trail
+   Registration: KDJ 672B
+   Rate: KSh 6,500/day
+
+
+############################################################
+# 5. RENTAL R001 - John rents the Prado, returns it 2 days late
+############################################################
+Toyota Prado rented to John Kamau for 4 day(s). Bill so far: KSh 34,000
+
+====================================
+        SAFARIDRIVE RENTALS
+====================================
+Rental ID:        R001
+Customer:         John Kamau
+Vehicle:          Toyota Prado
+Registration:     KDJ 456B
+Rental Period:    4 days
+Daily Rate:       KSh 8,000
+
+Rental Charge:    KSh 32,000
+Service Charge:   KSh  2,000
+------------------------------------
+TOTAL:            KSh 34,000
+Status:           ACTIVE
+Payment:          UNPAID
+====================================
+
+Trying to rent the same Prado again:
+  Error: Toyota Prado (KDJ 456B) is RENTED and cannot be rented.
+
+Toyota Prado returned after 6 day(s).
+  Late by 2 day(s): late fee KSh 3,200
+  Amount due: KSh 37,200
+
+Processing M-Pesa payment...
+Transaction: 34DJ44POT5
+Payment of KSh 37,200 successful.
+
+====================================
+        SAFARIDRIVE RENTALS
+====================================
+Rental ID:        R001
+Customer:         John Kamau
+Vehicle:          Toyota Prado
+Registration:     KDJ 456B
+Rental Period:    4 days
+Days Kept:        6 days
+Daily Rate:       KSh 8,000
+
+Rental Charge:    KSh 32,000
+Service Charge:   KSh  2,000
+Late Fee (2 days): KSh  3,200
+------------------------------------
+TOTAL:            KSh 37,200
+Status:           COMPLETED
+Payment:          PAID
+====================================
+
+############################################################
+# 6. RENTAL R002 - Mary rents the Axio, returns it with a scratch
+############################################################
+Toyota Axio rented to Mary Wanjiku for 3 day(s). Bill so far: KSh 12,000
+
+Toyota Axio returned after 3 day(s).
+  Damage charge: KSh 1,500
+  Amount due: KSh 13,500
+
+Processing card payment...
+Card ending 4417 charged KSh 13,500
+
+====================================
+        SAFARIDRIVE RENTALS
+====================================
+Rental ID:        R002
+Customer:         Mary Wanjiku
+Vehicle:          Toyota Axio
+Registration:     KDK 123A
+Rental Period:    3 days
+Daily Rate:       KSh 4,000
+
+Rental Charge:    KSh 12,000
+Damage Charge:    KSh  1,500
+------------------------------------
+TOTAL:            KSh 13,500
+Status:           COMPLETED
+Payment:          PAID
+====================================
+
+############################################################
+# 7. RENTAL R003 - Peter pays cash, but not enough at first
+############################################################
+Mercedes-Benz E-Class rented to Peter Otieno for 2 day(s). Bill so far: KSh 33,000
+
+Mercedes-Benz E-Class returned after 2 day(s).
+  Amount due: KSh 33,000
+
+Cash received: KSh 30,000
+Payment failed: KSh 3,000 short of the KSh 33,000 bill.
+Rental R003 is still unpaid.
+
+Cash received: KSh 35,000
+Change due:    KSh 2,000
+Cash payment of KSh 33,000 recorded.
+
+Trying to pay rental R003 a second time:
+  Error: Rental R003 has already been paid.
+
+############################################################
+# 8. RENTAL R004 - cancelled, then the car goes for service
+############################################################
+Nissan X-Trail rented to Mary Wanjiku for 5 day(s). Bill so far: KSh 34,500
+Rental R004 cancelled; Nissan X-Trail is available again.
+Nissan X-Trail status: MAINTENANCE
+
+Trying to rent a car that is under maintenance:
+  Error: Nissan X-Trail (KDJ 672B) is MAINTENANCE and cannot be rented.
+Nissan X-Trail is back: AVAILABLE
+
+############################################################
+# 9. THE OTHER BUSINESS RULES
+############################################################
+  Negative daily rate                -> ValueError: Daily rate cannot be negative.
+  Unregistered customer rents        -> NotRegisteredError: Walk-in must be registered before renting.
+  Vehicle not in the fleet           -> NotRegisteredError: KXX 999X is not in the fleet.
+  Zero rental days                   -> InvalidRentalPeriodError: Rental days must be greater than zero.
+  Returning a car that is not out    -> VehicleNotRentedError: KDK 123A is not out on rental, so it cannot be returned.
+  Completing a finished rental       -> RentalAlreadyCompletedError: Rental R001 has already been completed.
+Toyota Axio rented to John Kamau for 2 day(s). Bill so far: KSh 8,000
+  Paying before the car comes back   -> RentalNotCompletedError: Rental R005 is ACTIVE; it can only be paid once the vehicle has been returned.
+
+############################################################
+# 10. ENCAPSULATION - revenue cannot be faked
+############################################################
+  Real revenue:            KSh 83,700
+  After system.__revenue = 10,000,000: KSh 83,700
+  system.revenue = ... -> AttributeError: property 'revenue' of 'CarRentalSystem' object has no setter
+
+############################################################
+# 11. HISTORY AND LISTINGS
+############################################################
+
+RENTAL HISTORY - John Kamau (C001)
+  R001  Toyota Prado           6 day(s)  KSh   37,200  COMPLETED  (PAID)
+  R005  Toyota Axio            2 day(s)  KSh    8,000  ACTIVE
+
+RENTAL HISTORY - Mary Wanjiku (C002)
+  R002  Toyota Axio            3 day(s)  KSh   13,500  COMPLETED  (PAID)
+  R004  Nissan X-Trail         5 day(s)  KSh   34,500  CANCELLED
+
+RENTAL HISTORY - Peter Otieno (C003)
+  R003  Mercedes-Benz E-Class  2 day(s)  KSh   33,000  COMPLETED  (PAID)
+
+ACTIVE RENTALS
+  R005  John Kamau     Toyota Axio            KDK 123A   2 day(s)  KSh    8,000  UNPAID
+
+COMPLETED RENTALS
+  R001  John Kamau     Toyota Prado           KDJ 456B   6 day(s)  KSh   37,200  PAID
+  R002  Mary Wanjiku   Toyota Axio            KDK 123A   3 day(s)  KSh   13,500  PAID
+  R003  Peter Otieno   Mercedes-Benz E-Class  KDL 789C   2 day(s)  KSh   33,000  PAID
+
+############################################################
+# 12. MANAGEMENT REPORT
+############################################################
+
+=====================================
+    SAFARIDRIVE MANAGEMENT REPORT
+=====================================
+Total Vehicles:               6
+Available Vehicles:           5
+Rented Vehicles:              1
+
+Registered Customers:         3
+
+Total Rentals:                5
+Active Rentals:               1
+Completed Rentals:            3
+Cancelled Rentals:            1
+
+Total Revenue:       KSh 83,700
+-------------------------------------
+VEHICLES BY CATEGORY
+Economy Cars:                 2
+SUVs:                         2
+Luxury Cars:                  2
+=====================================
