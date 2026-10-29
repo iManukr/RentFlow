@@ -14,7 +14,7 @@ polymorphism and encapsulation in one working system.
 
 ## Quick start
 
-No third-party packages are needed — the standard library only.
+No third-party packages are needed, only the standard library.
 
 The project is managed with [uv](https://docs.astral.sh/uv/), so `uv run` picks
 the right Python (3.14, pinned in `.python-version`) without activating anything:
@@ -146,7 +146,7 @@ Late fee                             = KSh  3,200
 Final bill                           = KSh 37,200
 ```
 
-The late fee is worked out from the daily rate only — it never adds a second
+The late fee is worked out from the daily rate only. It never adds a second
 service charge or a second insurance premium.
 
 ---
@@ -214,8 +214,8 @@ Error: Toyota Prado (KDJ 456B) is RENTED and cannot be rented.
 ### Abstraction
 
 `Vehicle` and `Payment` are abstract base classes (`abc.ABC`). They declare
-*what* every vehicle and every payment must be able to do — a vehicle can work
-out the cost of a rental, a payment can take money — without saying *how*.
+*what* every vehicle and every payment must be able to do (a vehicle can work
+out the cost of a rental, a payment can take money) without saying *how*.
 `calculate_rental_cost(days)` and `process_payment()` are decorated with
 `@abstractmethod` and have no implementation at all in the parent. Because of
 that, `Vehicle("KDK 123A", "Toyota", "Axio", 2022, 4000)` raises a `TypeError`:
@@ -226,22 +226,22 @@ never needs to know which concrete classes exist.
 
 ### Inheritance
 
-`EconomyCar`, `SUV` and `LuxuryCar` inherit everything a vehicle has —
-registration number, make, model, year, daily rate, availability tracking,
-`display_details()` — and add only what makes them different: a service charge,
+`EconomyCar`, `SUV` and `LuxuryCar` inherit everything a vehicle has
+(registration number, make, model, year, daily rate, availability tracking,
+`display_details()`) and add only what makes them different: a service charge,
 an insurance percentage, or nothing at all. The same is true of
 `MpesaPayment`, `CardPayment` and `CashPayment`, which inherit the link to the
 rental, the amount and the success flag from `Payment`. Each child calls
 `super().__init__(...)` so the parent still does the shared setup and
 validation, then stores its own extra fields (a phone number, four card digits,
-the cash handed over). Adding a tenth vehicle type would mean writing one small
+the cash handed over). Adding another vehicle type would mean writing one small
 class, not touching the rest of the system.
 
 ### Polymorphism
 
 Both hierarchies are used through the parent's interface, never by checking
 types. `for car in [axio, prado, mercedes]: car.calculate_rental_cost(3)`
-returns 12,000, 26,000 and 49,500 — the same call, three different answers,
+returns 12,000, 26,000 and 49,500: the same call, three different answers,
 with no `if` statement deciding which rule applies. `CarRentalSystem.process_payment()`
 likewise calls `payment.process_payment()` without caring whether it is M-Pesa,
 card or cash; each class prints its own confirmation and returns `True` or
@@ -255,7 +255,7 @@ holding.
 
 The three pieces of data that must never be edited casually are private.
 `Vehicle.__available` and `Vehicle.__under_maintenance` can only change through
-`mark_as_rented()`, `mark_as_available()` and the maintenance methods — and
+`mark_as_rented()`, `mark_as_available()` and the maintenance methods, and
 `mark_as_rented()` itself refuses if the car is already out, so double-booking
 is impossible even if a caller forgets to check. `Rental.__paid` can only be set
 by `mark_as_paid()`, which first insists that the rental is completed and not
@@ -264,34 +264,24 @@ already paid. `CarRentalSystem.__revenue` is exposed through a read-only
 raises an `AttributeError`, and revenue only ever moves inside
 `process_payment()` after a payment has actually succeeded. Writing
 `system.__revenue = 10_000_000` from outside quietly creates a new, unrelated
-attribute and leaves the real figure untouched — the demo prints both to prove it.
+attribute and leaves the real figure untouched. The demo prints both to show this.
 
 ---
 
 ## The real-world problem this solves
 
-A rental company's money leaks through small record-keeping failures. When
-availability lives in a notebook, two members of staff can promise the same
-Prado to two customers on the same morning, and the company has to refund one
-of them and apologise. When returns are recorded loosely, cars that come back
-days late are billed as if they were on time, so the penalty that was supposed
-to protect the fleet is never collected. When bills are added up by hand, the
-service charge on an SUV or the insurance on a luxury car gets forgotten, and
-nobody notices until the month-end figures look wrong — if they are compiled at
-all.
+With notebooks and spreadsheets, the same car can be promised to two customers,
+late returns get billed as if they were on time, and service charges or
+insurance get left off bills.
 
-RentFlow closes those gaps by making the rules part of the software rather than
-part of someone's memory. A car that is out cannot be rented again, because
-availability is private state that only a successful rental can change. A late
-return is priced the moment it is recorded, from the car's own daily rate. A
-bill is assembled by the objects that know the charges, so the service charge
-and the insurance can never be left off. Payment can only be taken once, and
-only after the car is back, so the customer settles one correct final bill.
-And because every figure in the management report is counted from the lists of
-live objects, the owner can see the true state of the business — cars out,
-cars free, active rentals, revenue — at any moment, instead of waiting for
-someone to tally the notebooks. The system also keeps card data safe by
-storing only the last four digits, the way real payment systems do.
+RentFlow puts those rules in the code:
+
+- A car that is out can't be rented again.
+- Late fees are calculated when the car comes back.
+- Each vehicle adds its own extra charges to the bill.
+- Payment is taken once, after the return.
+- The management report counts cars, rentals and revenue from the live objects.
+- Card payments store only the last four digits.
 
 ---
 
@@ -299,11 +289,11 @@ storing only the last four digits, the way real payment systems do.
 
 Loaded by `build_system()` in `main.py`, and used by both the demo and the menu:
 
-**6 vehicles** — Toyota Axio (KDK 123A, 4,000), Mazda Demio (KCZ 908A, 3,500),
+**6 vehicles:** Toyota Axio (KDK 123A, 4,000), Mazda Demio (KCZ 908A, 3,500),
 Toyota Prado (KDJ 456B, 8,000), Nissan X-Trail (KDJ 672B, 6,500),
 Mercedes-Benz E-Class (KDL 789C, 15,000), BMW 5 Series (KDM 112D, 13,000).
 
-**3 customers** — John Kamau (C001), Mary Wanjiku (C002), Peter Otieno (C003).
+**3 customers:** John Kamau (C001), Mary Wanjiku (C002), Peter Otieno (C003).
 
 **5 rentals** created during the demo:
 
@@ -312,7 +302,7 @@ Mercedes-Benz E-Class (KDL 789C, 15,000), BMW 5 Series (KDM 112D, 13,000).
 | R001 | John Kamau | Toyota Prado | 4 days agreed, returned after 6 → late fee | KSh 37,200 |
 | R002 | Mary Wanjiku | Toyota Axio | 3 days, returned with a scratch → damage charge | KSh 13,500 |
 | R003 | Peter Otieno | Mercedes E-Class | 2 days, paid cash (short the first time) | KSh 33,000 |
-| R004 | Mary Wanjiku | Nissan X-Trail | Cancelled, then the car went for service | — |
+| R004 | Mary Wanjiku | Nissan X-Trail | Cancelled, then the car went for service | - |
 | R005 | John Kamau | Toyota Axio | Left active, to show payment being refused | KSh 8,000 |
 
 Revenue after the demo: **KSh 83,700** (37,200 + 13,500 + 33,000).
@@ -323,7 +313,7 @@ Revenue after the demo: **KSh 83,700** (37,200 + 13,500 + 33,000).
 
 Full transcript in [`sample_output.txt`](sample_output.txt).
 
-**Rental receipt** — the extra-charge line changes with the vehicle type:
+**Rental receipt** (the extra-charge line changes with the vehicle type):
 
 ```text
 ====================================
@@ -371,8 +361,8 @@ AVAILABLE SUVs
    Rate: KSh 6,500/day
 ```
 
-**Management report** — every figure is counted from the objects in the lists,
-never typed in:
+**Management report** (every figure is counted from the objects in the lists,
+never typed in):
 
 ```text
 =====================================
@@ -429,16 +419,16 @@ rules, the read-only revenue property, and the figures in the management report.
 
 ## OOP checklist
 
-- [x] At least one abstract class — `Vehicle` and `Payment`
-- [x] At least two parent classes — `Vehicle`, `Payment`
-- [x] At least five child classes — `EconomyCar`, `SUV`, `LuxuryCar`, `MpesaPayment`, `CardPayment`, `CashPayment` (six)
+- [x] At least one abstract class: `Vehicle` and `Payment`
+- [x] At least two parent classes: `Vehicle`, `Payment`
+- [x] At least five child classes: `EconomyCar`, `SUV`, `LuxuryCar`, `MpesaPayment`, `CardPayment`, `CashPayment` (six)
 - [x] `super().__init__()` used in every child that adds state
-- [x] Methods overridden in child classes — `calculate_rental_cost()`, `extra_charges()`, `process_payment()`
+- [x] Methods overridden in child classes: `calculate_rental_cost()`, `extra_charges()`, `process_payment()`
 - [x] Polymorphism with `calculate_rental_cost()` and `process_payment()`
 - [x] Private attributes for availability, payment status and revenue
-- [x] Lists of objects — `vehicles`, `customers`, `rentals`, `payments`, `Customer.rentals`
+- [x] Lists of objects: `vehicles`, `customers`, `rentals`, `payments`, `Customer.rentals`
 - [x] Loops and conditionals throughout
 - [x] `try` / `except` around everything that can fail, in `main.py` and the menu
-- [x] Methods that return values — `calculate_total()`, `find_vehicle()`, `search_vehicles()`
-- [x] Methods that change state — `mark_as_rented()`, `complete_rental()`, `mark_as_paid()`
+- [x] Methods that return values: `calculate_total()`, `find_vehicle()`, `search_vehicles()`
+- [x] Methods that change state: `mark_as_rented()`, `complete_rental()`, `mark_as_paid()`
 - [x] Code split across multiple files
